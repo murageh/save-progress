@@ -1,6 +1,5 @@
 import {useFormikContext} from 'formik';
 import {useEffect} from 'react';
-import {useSaveProgress} from "../../hooks";
 
 export interface AutoSaveFormProps {
     saveFunction: any;
