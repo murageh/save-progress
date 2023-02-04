@@ -1,0 +1,52 @@
+{
+  "name": "@crispice/save-progress",
+  "version": "1.0.0",
+  "description": "A React hook to save progress in a form, or any other scenario, and restore it when the user returns to the form. It uses localStorage to save the progress.",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "types": "dist/index.d.ts",
+  "author": {
+    "name": "MURAGEH",
+    "url": "https://github.com/murageh"
+  },
+  "homepage": "https://github.com/murageh/save-progress#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/murageh/save-progress.git"
+  },
+  "keywords": [
+    "react-hooks",
+    "use-save-progress",
+    "react",
+    "typescript",
+    "rollup",
+    "template",
+    "component",
+    "package"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "build": "rollup -c",
+    "watch": "rollup -c -w"
+  },
+  "dependencies": {
+    "typescript": "^4.9.3"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^23.0.2",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@rollup/plugin-typescript": "^9.0.2",
+    "formik": "^2.2.9",
+    "rollup": "^3.3.0",
+    "rollup-plugin-dts": "^5.0.0",
+    "tslib": "^2.4.1"
+  },
+  "peerDependencies": {
+    "@types/react": ">=17.0.0",
+    "react": ">=17.0.0"
+  }
+}
