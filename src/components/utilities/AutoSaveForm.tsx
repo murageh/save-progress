@@ -1,5 +1,5 @@
 import {useFormikContext} from 'formik';
-import {useEffect} from 'react';
+import React from 'react';
 
 export interface AutoSaveFormProps {
     saveFunction: any;
@@ -18,7 +18,7 @@ const AutoSaveForm = (props: AutoSaveFormProps) => {
     const {values} = useFormikContext();
 
     // Save the form data when the user changes the form data.
-    useEffect(() => {
+    React.useEffect(() => {
         try {
             saveFunction(values);
         } catch (error) {
