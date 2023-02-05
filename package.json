@@ -1,6 +1,6 @@
 {
   "name": "@crispice/save-progress",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A React hook to save progress in a form, or any other scenario, and restore it when the user returns to the form. It uses localStorage to save the progress.",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
