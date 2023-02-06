@@ -16,24 +16,26 @@ import React from 'react';
  *
  * @param key The key to use to save the data in local storage
  * @param initialValue The initial value to use if there is no data in local storage
+ * @param storage The storage to use, defaults to local storage
  *
  * @returns [values, updateValues, clearValues] The data, a function to update the data, and a function to clear the data
  */
-const useSaveProgress = ({key, initialValues}: { key: string, initialValues?: any }) => {
+const useSaveProgress = ({key, initialValues, storage}: { key: string, initialValues?: any, storage?: Storage }) => {
     const [values, setValues] = React.useState(() => {
-        const saved = localStorage.getItem(key);
+        const saved = (storage ?? localStorage).getItem(key);
         const initialValue = JSON.parse(saved!);
-        return initialValue || {};
+        return initialValue || initialValues || {};
     });
 
     // Helper function to save the data to local storage
     const saveValues = (value: any) => {
-        localStorage.setItem(key, JSON.stringify(value));
+        (storage ?? localStorage).setItem(key, JSON.stringify(value));
     };
 
     // Provide helper function to clear the data from local storage
     const clearValues = () => {
-        localStorage.removeItem(key);
+        setValues(initialValues || {});
+        (storage ?? localStorage).removeItem(key);
     };
 
     // Provide helper function to update the data in local storage
@@ -41,13 +43,6 @@ const useSaveProgress = ({key, initialValues}: { key: string, initialValues?: an
         setValues(value);
         saveValues(value);
     }
-
-    React.useEffect(() => {
-        if (initialValues) {
-            setValues(initialValues);
-            saveValues(initialValues);
-        }
-    }, [initialValues]);
 
     return [values, updateValues, clearValues];
 };

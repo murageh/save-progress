@@ -2,7 +2,7 @@ import {useFormikContext} from 'formik';
 import React from 'react';
 
 export interface AutoSaveFormProps {
-    saveFunction: any;
+    saveFunction: (values: any) => void;
 }
 
 /**

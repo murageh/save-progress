@@ -1,6 +1,6 @@
 # save-progress
 
-I was recently working on a project that involved lots of data entry.
+I recently worked on a project that involved lots of data entry.
 The forms were too long, and I wanted to make sure that the user's progress was saved,
 so that they could come back to the form later,
 and continue where they left off.
@@ -76,7 +76,7 @@ const MyFormComponent = () => {
 
 ### The AutoSaveForm component
 
-This component is designed to be used inside a Formik form. It only takes one prop, which is the saveFunction. You can
+This component is designed to be used inside a Formik form. It only takes one prop, which is `saveFunction`. You can
 pass any function to this prop, but it was designed to use the `updateValues` function returned by the `useSaveProgress`
 hook.
 
