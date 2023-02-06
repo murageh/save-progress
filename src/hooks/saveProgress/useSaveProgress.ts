@@ -23,7 +23,7 @@ const useSaveProgress = ({key, initialValues}: { key: string, initialValues?: an
     const [values, setValues] = React.useState(() => {
         const saved = localStorage.getItem(key);
         const initialValue = JSON.parse(saved!);
-        return initialValue || {};
+        return initialValue || initialValues || {};
     });
 
     // Helper function to save the data to local storage
@@ -41,13 +41,6 @@ const useSaveProgress = ({key, initialValues}: { key: string, initialValues?: an
         setValues(value);
         saveValues(value);
     }
-
-    React.useEffect(() => {
-        if (initialValues) {
-            setValues(initialValues);
-            saveValues(initialValues);
-        }
-    }, [initialValues]);
 
     return [values, updateValues, clearValues];
 };
