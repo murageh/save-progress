@@ -43,6 +43,21 @@ If you do not pass this argument, the values will be set to an empty object, and
 The hook will also return the values from the local storage if they exist. If they do not exist, it will return the
 initial values, or an empty object if no initial values were passed.
 
+> Update: You can choose where to save the values. You can either save them to the local storage, or to the session storage.
+> To do this, pass a `storage` property to the object passed to the hook. The value of this property should be either
+> `localStorage` or `sessionStorage`. If you do not pass this property, the values will be saved to the local storage.
+> 
+> At the same time, you can use `useProgress` in place of `useSaveProgress` to use the local storage, or the session storage.
+> The underlying logic is the same, but the name is different. The `useProgress` hook takes the same arguments as the
+> `useSaveProgress` hook.
+> 
+> Example:
+> ```typescript jsx
+> const [values, updateValues, deleteValues] = useSaveProgress({key: 'user-form', storage: sessionStorage});
+> // or
+> // const [values, updateValues, deleteValues] = useProgress({key: 'user-form', storage: sessionStorage});
+> ```
+
 ```typescript jsx
 import {useSaveProgress} from "@crispice/save-progress";
 
