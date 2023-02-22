@@ -21,21 +21,29 @@ import React from 'react';
  * @returns [values, updateValues, clearValues] The data, a function to update the data, and a function to clear the data
  */
 const useSaveProgress = ({key, initialValues, storage}: { key: string, initialValues?: any, storage?: Storage }) => {
-    const [values, setValues] = React.useState(() => {
-        const saved = (storage ?? localStorage).getItem(key);
-        const initialValue = JSON.parse(saved!);
-        return initialValue || initialValues || {};
-    });
+    const [values, setValues] = React.useState(initialValues || {});
+
+    React.useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const saved = (storage ?? window.localStorage).getItem(key);
+            const initialValue = JSON.parse(saved!);
+            setValues(initialValue || initialValues || {});
+        }
+    }, []);
 
     // Helper function to save the data to local storage
     const saveValues = (value: any) => {
-        (storage ?? localStorage).setItem(key, JSON.stringify(value));
+        if (typeof window !== 'undefined') {
+            (storage ?? window.localStorage).setItem(key, JSON.stringify(value));
+        }
     };
 
     // Provide helper function to clear the data from local storage
     const clearValues = () => {
         setValues(initialValues || {});
-        (storage ?? localStorage).removeItem(key);
+        if (typeof window !== 'undefined') {
+            (storage ?? window.localStorage).removeItem(key);
+        }
     };
 
     // Provide helper function to update the data in local storage
