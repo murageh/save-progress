@@ -33,13 +33,17 @@ const useSaveProgress = ({key, initialValues, storage}: { key: string, initialVa
 
     // Helper function to save the data to local storage
     const saveValues = (value: any) => {
-        (storage ?? localStorage).setItem(key, JSON.stringify(value));
+        if (typeof window !== 'undefined') {
+            (storage ?? window.localStorage).setItem(key, JSON.stringify(value));
+        }
     };
 
     // Provide helper function to clear the data from local storage
     const clearValues = () => {
         setValues(initialValues || {});
-        (storage ?? localStorage).removeItem(key);
+        if (typeof window !== 'undefined') {
+            (storage ?? window.localStorage).removeItem(key);
+        }
     };
 
     // Provide helper function to update the data in local storage
