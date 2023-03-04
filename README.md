@@ -163,7 +163,7 @@ const MyFormComponent = () => {
             validate={values => {
                 const errors = {};
                 if (values.name.length < 1) {
-                    errors.token = 'Enter a name.';
+                    errors.name = 'Enter a name.';
                 }
                 return errors;
             }}

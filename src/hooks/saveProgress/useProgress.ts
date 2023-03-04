@@ -42,17 +42,26 @@ function useProgress<T extends {}>({
                                        clearFunction,
                                        forceLocalActions = false
                                    }: useProgressProps<T>) {
+    const [initialized, setInitialized] = React.useState(false);
     const [values, setValues] = React.useState(initialValues);
 
     React.useEffect(() => {
         if (typeof window !== 'undefined') {
             const saved = (storage ?? window.localStorage).getItem(key);
-            const initialValue: T = JSON.parse(saved!);
+            let initialValue: T;
+            try {
+                initialValue = JSON.parse(saved!);
+            } catch (e) {
+                initialValue = {} as T;
+            }
             setValues(initialValue || initialValues || {} as T);
+            saveValues(values);
+            setInitialized(true);
         }
     }, []);
 
     React.useEffect(() => {
+        if (!initialized) return;
         saveValues(values);
     }, [values]);
 
