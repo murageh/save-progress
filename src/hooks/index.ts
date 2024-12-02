@@ -1,4 +1,4 @@
 /*  export hooks */
 
-export {useSaveProgress} from './saveProgress/useProgress';
-export {default as useProgress} from './saveProgress/useProgress';
+export {useProgress, useSaveProgress} from './saveProgress/useProgress';
+export {default as useFormProgress} from './saveProgress/useProgress';

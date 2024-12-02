@@ -7,57 +7,61 @@ export interface useProgressProps<T extends {}> {
     saveFunction?: (values: T) => void;
     clearFunction?: (values?: T) => void;
     forceLocalActions?: boolean;
+    fetchInitialValues?: () => Promise<T>;
 }
 
 /**
- * If you are using `useSaveProgress`, please migrate to `useProgress` instead.
+ * Custom hook to save and manage the progress of user input, such as form data.
+ * This hook ensures that user input is preserved even if the user navigates away from the page.
  *
- * This is a custom hook that is used to save the progress of the user's input,
- * for instance, if the user is filling out a form, and they leave the page,
- * the next time they come back, the form will be filled out with the data
- * they had previously entered.
- *
- *
- * Typical usage:
- * Use this hook to save the progress of the user's input, for instance, if the user is filling out a form, and they leave the page,
- * the next time they come back, the form will be filled out with the data they had previously entered.
- *
- * The {@link AutoSaveForm} component is a helper component that will automatically save the data when the form is submitted.
- * The {@link AutoSaveForm} requires a saveFunction prop, which is the setValues function returned by this hook, or any other function.
- *
- * @param key The key to use to save the data in local storage
- * @param initialValue The initial value to use if there is no data in local storage
- * @param storage The storage to use, defaults to local storage
- * @param saveFunction A function to save the data to a server. If this is provided, the data will not be saved locally. You can use this function to customize the save logic.
- * @param clearFunction A function to clear the data from a server. If this is provided, the data will not be cleared locally. You can use this function to customize the clear logic.
- * @param forceLocalActions If true, the data will be saved locally even if a saveFunction is provided. This is useful if you want to save the data locally, in addition to saving it to a server. This also applies to the clearFunction
- *
- * @returns [values, setValues, clearValues] The data, a function to update the data, and a function to clear the data
- */
-function useProgress<T extends {}>({
-                                       key,
-                                       initialValues = {} as T,
-                                       storage,
-                                       saveFunction,
-                                       clearFunction,
-                                       forceLocalActions = false
-                                   }: useProgressProps<T>) {
+ * @template T - The type of the form values.
+ * @param {Object} props - The properties for the hook.
+ * @param {string} props.key - The key to identify the stored values.
+ * @param {T} [props.initialValues] - The initial values for the form.
+ * @param {Storage} [props.storage] - The storage to use (localStorage or sessionStorage). Defaults to localStorage.
+ * @param {(values: T) => void} [props.saveFunction] - Custom function to save values. If provided, this will be used instead of the storage.
+ * @param {(values?: T) => void} [props.clearFunction] - Custom function to clear values. Crucial for custom save functions.
+ * @param {boolean} [props.forceLocalActions] - Whether to force local storage actions even if custom functions are provided. Could be useful for debugging.
+ * @param {() => Promise<T>} [props.fetchInitialValues] - Function to fetch initial values asynchronously. Values from this function will override the storage values.
+ * @returns {[T, React.Dispatch<React.SetStateAction<T>>, () => void]} - Returns the current values, a function to update the values, and a function to clear the values.
+ * */
+function useFormProgress<T extends {}>({
+                                           key,
+                                           initialValues = {} as T,
+                                           storage,
+                                           saveFunction,
+                                           clearFunction,
+                                           forceLocalActions = false,
+                                           fetchInitialValues,
+                                       }: useProgressProps<T>) {
     const [initialized, setInitialized] = React.useState(false);
     const [values, setValues] = React.useState(initialValues);
 
     React.useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const saved = (storage ?? window.localStorage).getItem(key);
-            let initialValue: T;
-            try {
-                initialValue = JSON.parse(saved!);
-            } catch (e) {
-                initialValue = {} as T;
+        const initializeValues = async () => {
+            let initialValue: T = initialValues;
+
+            if (fetchInitialValues) {
+                try {
+                    initialValue = await fetchInitialValues();
+                } catch (e) {
+                    console.error('Failed to fetch initial values:', e);
+                }
+            } else if (typeof window !== 'undefined') {
+                const saved = (storage ?? window.localStorage).getItem(key);
+                try {
+                    initialValue = JSON.parse(saved!);
+                } catch (e) {
+                    initialValue = {} as T;
+                }
             }
+
             setValues(initialValue || initialValues || {} as T);
-            saveValues(values);
+            saveValues(initialValue);
             setInitialized(true);
-        }
+        };
+
+        void initializeValues();
     }, []);
 
     React.useEffect(() => {
@@ -65,7 +69,6 @@ function useProgress<T extends {}>({
         saveValues(values);
     }, [values]);
 
-    // Helper function to save the data to local storage
     const saveValues = (values: T) => {
         if (saveFunction) {
             saveFunction(values);
@@ -76,7 +79,6 @@ function useProgress<T extends {}>({
         }
     };
 
-    // Provide helper function to clear the data from local storage
     const clearValues = () => {
         setValues(initialValues);
         if (clearFunction) {
@@ -91,9 +93,15 @@ function useProgress<T extends {}>({
     return [values, setValues, clearValues] as const;
 }
 
-export default useProgress;
+export default useFormProgress;
 
 /**
  * @deprecated Use the {@link useProgress} hook instead.
  */
-export const useSaveProgress = useProgress;
+export const useProgress = useFormProgress;
+
+/**
+ * @deprecated Use the {@link useProgress} hook instead.
+ * This will be removed in the next major version.
+ */
+export const useSaveProgress = useFormProgress;

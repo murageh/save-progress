@@ -1,28 +1,34 @@
-# useProgress
+# useFormProgress
 
 #### Your progressive form lifesaver (No pun intended... or was it?). Save your form's progress without hassle.
 
 Ever worked on a form that was too long, and you had to stop halfway through, only to forget where you stopped?
-Or maybe you had to close the browser, and you had to start all over again? Well, this package was designed for you.
+Or maybe you had to close the browser, and you had to start all over again?
+Well, this package was designed to control such cases.
 
-This package allows you to save the progress of your form, and reload it later. It is designed to work with any form,
-and does not have any UI elements. It is up to you to create the form, and handle the submit event.
+This package allows you to save the progress of your form and reload it later.
+It is designed to work with any form, and does not have any UI elements.
+It is up to you to create the form and handle the `submit` event.
 
 ## Features
-1. Save the progress of your form to the local storage, or to the session storage.
+
+1. Save your form progress to the local storage, or to the session storage.
+   > Update (23/02/2023): With the `saveFunction` prop, you can define your own save function.
+   > This is useful if you want to save the values to a database, or to a server, and probably clear them later.
+   > The function will be called every time the values are updated.
+   > The same applies to the `clearFunction` prop. This function will be called every time the values are cleared.
+   > Using the `forceLocalActions` prop, you can maintain the default behavior while still carrying out your custom
+   logic.
 2. Reload the values from the local storage, or from the session storage.
 3. Clear the values from the local storage, or from the session storage.
-    
-    ```You can choose where to save the values. You can either save them to the local storage, or to the session storage.```
-
 4. You can define your own save and clear functions. This is useful if you want to save the values to a database, or to a server, and probably clear them later.
-5. If you use TypeScript, or you like strict typing, you can explicitly declare the type of data the hook will accept and return. This is useful if you want to
-have stricter control over your data. If you fear Types, feel free to pass `<any>` as the type. Don't tell anyone I said that. 😀
+5. If you use TypeScript, or you like strict typing, you can explicitly declare the type of data the hook will accept
+   and return. This is useful if you want to have stricter control over your data. If you fear Types, feel free to pass
+   `<any>` as the type. Don't tell anyone I said that. 😀
 6. You can maintain the default behavior while still carrying out your custom logic.
-7. You can use the hook on its, or with the AutoSaveForm component. The AutoSaveForm component is designed to be
-used inside a Formik form, and will handle the repetitive tasks of saving the data for you. 
-Just plug in your save function, and you are good to go. Come back later ,and your form will be saved.
-
+7. You can use the hook on its own, or with the `AutoSaveFormikForm` component. The `AutoSaveFormikForm` component is
+   designed to be used inside a Formik form, and will handle the repetitive tasks of saving the data for you. Just plug
+   in your save function, and you are good to go. Come back later, and your form will be saved.
 
 Awesome, right? Well, let's get started.
 
@@ -42,52 +48,57 @@ yarn add @crispice/save-progress
 
 ## Usage
 
-## The `useProgress` hook
+### The `useProgress` hook
 
 - The hook takes an object as an argument. The object must have a `key` property, which is a string.
-The key is used to identify the data in the local or session storage. It is recommended that you use a unique key for each form.
-- The hook returns an array with three items. The first item is the values object, which contains the saved values.
-The second item is the updateValues function, which is used to update the values in the local storage.
-The third item is the deleteValues function, which is used to delete the values from storage.
+  The key is used to identify the data in the local or session storage. It is recommended that you use a unique key for
+  each form.
+- The hook returns an array with three items. The first item is the `values` object, which contains the saved values.
+  The second item is the `updateValues` function, which is used to update the values in the local storage.
+  The third item is the `deleteValues` function, which is used to delete the values from storage.
 
 - The hook also takes an optional second argument, which is an object containing the initial values.
-If you pass this argument, the values will be set to the initial values, and will be saved to the local storage.
-If you do not pass this argument, the values will be set to an empty object, and will be saved to the local storage.
+  If you pass this argument, the values will be set to the initial values, and will be saved to the local storage.
+  If you do not pass this argument, the values will be set to an empty object, and will be saved to the local storage.
 
 The hook will also return the values from the local storage if they exist. If they do not exist, it will return the
 initial values, or an empty object if no initial values were passed.
 
-> Update (23/02/2023): 
+> Update (23/02/2023):
 > 1. You can choose where to save the values. You can either save them to the local storage, or to the session storage.
-> To do this, pass a `storage` property to the object passed to the hook. The value of this property should be either
-> `localStorage` or `sessionStorage`. If you do not pass this property, the values will be saved to the local storage.
-> 
+     > To do this, pass a `storage` property to the object passed to the hook. The value of this property should be
+     either
+     > `localStorage` or `sessionStorage`. If you do not pass this property, the values will be saved to the local
+     storage.
+>
 > 2. We renamed the hook to `useProgress`. However, you can still `useSaveProgress` if you prefer, to maintain backwards compatibility.
-> 3. We added optional `saveFunction` and `clearFunction` props. 
->    - These functions are supposed to be used in the case that you need to define your 
->    own save and clear functions. This is useful if you want to save the values to a database, or to a server, and probably clear them later. The functions will be called
->    every time the values are updated, or cleared, respectively. 
->    - The functions will be passed the values as an argument. Please note that this will short 
->    circuit the storage of the values in the local storage. 
+> 3. We added optional `saveFunction` and `clearFunction` props.
+     > - These functions are supposed to be used in the case that you need to define your
+     > own save and clear functions. This is useful if you want to save the values to a database, or to a server, and
+     probably clear them later. The functions will be called
+     > every time the values are updated, or cleared, respectively.
+     >
+- The functions will be passed the values as an argument. Please note that this will short
+  > circuit the storage of the values in the local storage.
 >    - If you want to maintain the default behavior while still carrying out your custom logic,
->    set optional argument, `forceLocalActions = true`, or carry them inside your custom logic.
+       > set optional argument, `forceLocalActions = true`, or carry them inside your custom logic.
 > 4. If you use TypeScript, or you like strict typing, you can explicitly declare the type of data the hook will accept and return. This is useful if you want to
-> have stricter control over your data. 
-> For example:
-> ```typescript jsx
-> const [values, updateValues, deleteValues] = useProgress<{name: string, email: string}>({key: 'user-form'});
+     > have stricter control over your data.
+     > For example:
+> ```typescript
+> const [values, updateValues, deleteValues] = useFormProgress<{name: string, email: string}>({key: 'user-form'});
 > ```
 
+#### Example
 
-### Example
-```typescript jsx
-import {useProgress} from "@crispice/save-progress";
+```typescript
+import {useFormProgress} from "@crispice/save-progress";
 
 const MyFormComponent = () => {
-    const [values, updateValues, deleteValues] = useProgress({key: 'user-form'});
+    const [values, updateValues, deleteValues] = useFormProgress({key: 'user-form'});
 
     // or
-    const [values, updateValues, deleteValues] = useProgress({
+    const [values, updateValues, deleteValues] = useFormProgress({
         key: 'user-form',
         initialValues: {name: '', email: ''},
         // you can select where to save. Accepts localStorage or sessionStorage
@@ -124,10 +135,9 @@ const MyFormComponent = () => {
         </form>
     )
 }
-
 ```
 
-## The AutoSaveForm component
+### The `AutoSaveFormikForm` component
 
 This component is designed to be used inside a Formik form. It only takes one prop, which is `saveFunction`. You can
 pass any function to this prop, but it was designed to use the `updateValues` function returned by the `useProgress`
@@ -135,20 +145,21 @@ hook.
 
 It is primarily a passive component, and does not have any UI elements.
 
-It is up to you to create the form and handle the submit event. After submitting the form, it is advised that you reset
+It is up to you to create the form and handle the `submit` event. After submitting the form, it is advised that you
+reset
 the form values (using Formik's reset method, or any other way you see fit).
 - Once your form is reset, the values will be cleared from the local storage as well. Failure to do so will result in the values not being cleared from the local storage, and will be reloaded the next time the form is loaded.
 
 *Note that using this component outside a Formik context will result in a warning, or most likely, an error.*
 
 #### Example
-```typescript jsx
 
-import {AutoSaveForm, useProgress} from "@crispice/save-progress";
+```typescript
+import {AutoSaveFormikForm, useFormProgress} from "@crispice/save-progress";
 import {Formik, Form, Field} from 'formik';
 
 const MyFormComponent = () => {
-    const [values, updateValues, _] = useProgress({key: 'user-form', initialValues: {name: ''}});
+    const [values, updateValues, _] = useFormProgress({key: 'user-form', initialValues: {name: ''}});
 
     const handleChange = (e) => {
         // do something with the values
@@ -171,7 +182,7 @@ const MyFormComponent = () => {
                 setTimeout(() => {
                     alert(JSON.stringify(values, null, 2));
                     actions.setSubmitting(false);
-                    // call Formik's reset method. This will clear the form values, 
+                    // call Formik's reset method. This will clear the form values,
                     // and will also clear the values from the local storage.
                     resetForm({values: {name: ''}});
                 }, 1000);
@@ -179,12 +190,63 @@ const MyFormComponent = () => {
         >
             <Form>
                 <Field name="name" type="text"/>
-                <AutoSaveForm saveFunction={updateValues}/>
+    <AutoSaveFormikForm saveFunction = {updateValues}
+    />
             </Form>
         </Formik>
     )
 }
+```
 
+## Migration Instructions
+
+If you are upgrading from a previous version, please note the following changes:
+
+1. The `useSaveProgress` hook has been renamed to `useFormProgress`. You can still use `useSaveProgress` and
+   `useProgress` for backwards compatibility, but it is recommended to switch to `useFormProgress`.
+2. The `AutoSaveForm` component has been renamed to `AutoSaveFormikForm`. You can still use `AutoSaveForm` for backwards
+   compatibility, but it is recommended to switch to `AutoSaveFormikForm`.
+
+To migrate, follow these steps:
+
+1. Replace all instances of `useSaveProgress` and `useProgress` with `useFormProgress`.
+2. Replace all instances of `AutoSaveForm` with `AutoSaveFormikForm`.
+
+Example migration:
+
+Before:
+
+```typescript
+import {useFormProgress} from "@crispice/save-progress";
+import {AutoSaveForm} from "@crispice/save-progress";
+
+const MyFormComponent = () => {
+    const [values, updateValues, deleteValues] = useSaveProgress({key: 'user-form'});
+
+    return (
+        // ... formik wrapper
+        <AutoSaveForm saveFunction = {updateValues}
+    />
+    // ... rest of the form
+)
+}
+```
+
+After:
+
+```typescript
+import {useFormProgress} from "@crispice/save-progress";
+import {AutoSaveFormikForm} from "@crispice/save-progress";
+
+const MyFormComponent = () => {
+    const [values, updateValues, deleteValues] = useFormProgress({key: 'user-form'});
+
+    return (
+        <AutoSaveFormikForm saveFunction = {updateValues} >
+            {/* form elements */}
+            < /AutoSaveFormikForm>
+    )
+}
 ```
 
 ---
