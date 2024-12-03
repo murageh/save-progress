@@ -33,11 +33,11 @@ export interface AutoSaveFormProps<T extends {}> extends useProgressProps<T> {
  */
 const AutoSaveFormikForm = React.memo(
     function AutoSaveFormikForm<T extends {}>(props: AutoSaveFormProps<T>) {
+        const [initialized, setInitialized] = React.useState(false);
         const { values, setValues } = useFormikContext<T>();
         const { dataKey, storage = localStorage, saveFunction, clearFunction, forceLocalActions, children } = props;
         const [_, updateValues] = useFormProgress<T>({
             dataKey: dataKey,
-            initialValues: values, // Prioritize Formik values
             storage,
             saveFunction,
             clearFunction,
@@ -50,20 +50,18 @@ const AutoSaveFormikForm = React.memo(
                 const parsedValues = JSON.parse(savedValues);
                 setValues((prevValues) => ({ ...prevValues, ...parsedValues }));
             }
+            setInitialized(true);
         }, [dataKey, setValues, storage]);
 
-        const memoizedUpdateValues = React.useCallback(() => {
+        React.useEffect(() => {
+            if (!initialized) return;
             try {
                 updateValues(values);
             } catch (error) {
                 console.warn("Error saving form data. Please check the save function. If the error persists, please contact the developer.");
                 console.log(error);
             }
-        }, [values, updateValues]);
-
-        React.useEffect(() => {
-            memoizedUpdateValues();
-        }, [memoizedUpdateValues]);
+        }, [initialized, values, updateValues]);
 
         return <>{children || null}</>;
     });
