@@ -35,9 +35,22 @@ const AutoSaveFormikForm = React.memo(
     function AutoSaveFormikForm<T extends {}>(props: AutoSaveFormProps<T>) {
         const [initialized, setInitialized] = React.useState(false);
         const { values, setValues } = useFormikContext<T>();
-        const { dataKey, storage = localStorage, saveFunction, clearFunction, forceLocalActions, children } = props;
+        const { dataKey, storage = localStorage, saveFunction:onUpdate, clearFunction: toClear, forceLocalActions, children } = props;
+        let saveFunction, clearFunction;
+        if (!onUpdate){
+            saveFunction = (values: T) => {
+                console.info("Saving form data...", values);
+                storage.setItem(dataKey, JSON.stringify(values));
+            }
+        } else saveFunction = onUpdate;
+        if (!toClear) {
+            clearFunction = () => {
+                storage.removeItem(dataKey);
+            }
+        }
         const [_, updateValues] = useFormProgress<T>({
             dataKey: dataKey,
+            initialValues: values,
             storage,
             saveFunction,
             clearFunction,
@@ -48,6 +61,7 @@ const AutoSaveFormikForm = React.memo(
             const savedValues = storage.getItem(dataKey);
             if (savedValues) {
                 const parsedValues = JSON.parse(savedValues);
+                console.info("Retrieved data", savedValues);
                 setValues((prevValues) => ({ ...prevValues, ...parsedValues }));
             }
             setInitialized(true);
@@ -62,6 +76,18 @@ const AutoSaveFormikForm = React.memo(
                 console.log(error);
             }
         }, [initialized, values, updateValues]);
+
+        React.useEffect(() => {
+            return () => {
+                // This cleanup function will run when the component is about to unmount
+                try {
+                    updateValues(values);
+                } catch (error) {
+                    console.warn("Error saving form data before unmount. Please check the save function. If the error persists, please contact the developer.");
+                    console.log(error);
+                }
+            };
+        }, [values, updateValues]);
 
         return <>{children || null}</>;
     });
