@@ -77,14 +77,11 @@ initial values, or an empty object if no initial values were passed.
      > own save and clear functions. This is useful if you want to save the values to a database, or to a server, and
      probably clear them later. The functions will be called
      > every time the values are updated, or cleared, respectively.
-     >
-- The functions will be passed the values as an argument. Please note that this will short
-  > circuit the storage of the values in the local storage.
->    - If you want to maintain the default behavior while still carrying out your custom logic,
-       > set optional argument, `forceLocalActions = true`, or carry them inside your custom logic.
+     > - The functions will be passed the values as an argument. Please note that this will short-circuit the storage of the values in the local storage.
+>    - If you want to maintain the default behavior while still carrying out your custom logic, set optional argument, `forceLocalActions = true`, or carry them inside your custom logic.
 > 4. If you use TypeScript, or you like strict typing, you can explicitly declare the type of data the hook will accept and return. This is useful if you want to
-     > have stricter control over your data.
-     > For example:
+     > have stricter control over your data. However, the compiler will infer the type of the data automatically if you pass the initial values. Here's an example for manually declaring the type:
+
 > ```typescript
 > const [values, updateValues, deleteValues] = useFormProgress<{name: string, email: string}>({dataKey: 'user-form'});
 > ```

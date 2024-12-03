@@ -16,7 +16,7 @@ export interface useProgressProps<T extends {}> {
  *
  * @template T - The type of the form values.
  * @param {Object} props - The properties for the hook.
- * @param {string} props.key - The dataKey to identify the stored values.
+ * @param {string} props.dataKey - The dataKey to identify the stored values.
  * @param {T} [props.initialValues] - The initial values for the form.
  * @param {Storage} [props.storage] - The storage to use (localStorage or sessionStorage). Defaults to localStorage.
  * @param {(values: T) => void} [props.saveFunction] - Custom function to save values. If provided, this will be used instead of the storage.
