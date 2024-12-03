@@ -22,7 +22,7 @@ export interface AutoSaveFormProps<T extends {}> extends useProgressProps<T> {
  *
  * @template T - The type of the form values.
  * @param {AutoSaveFormProps<T>} props - The properties for the component.
- * @param {string} props.key - The key to identify the stored values.
+ * @param {string} props.dataKey - The dataKey to identify the stored values.
  * @param {T} [props.initialValues] - The initial values for the form.
  * @param {Storage} [props.storage] - The storage to use (localStorage or sessionStorage). Defaults to localStorage.
  * @param {(values: T) => void} [props.saveFunction] - Custom function to save values. If provided, this will be used instead of the storage.
@@ -33,16 +33,24 @@ export interface AutoSaveFormProps<T extends {}> extends useProgressProps<T> {
  */
 const AutoSaveFormikForm = React.memo(
     function AutoSaveFormikForm<T extends {}>(props: AutoSaveFormProps<T>) {
-        const {values} = useFormikContext<T>();
-        const {key, storage, saveFunction, clearFunction, forceLocalActions, children} = props;
+        const { values, setValues } = useFormikContext<T>();
+        const { dataKey, storage = localStorage, saveFunction, clearFunction, forceLocalActions, children } = props;
         const [_, updateValues] = useFormProgress<T>({
-            key,
+            dataKey: dataKey,
             initialValues: values, // Prioritize Formik values
             storage,
             saveFunction,
             clearFunction,
             forceLocalActions,
         });
+
+        React.useEffect(() => {
+            const savedValues = storage.getItem(dataKey);
+            if (savedValues) {
+                const parsedValues = JSON.parse(savedValues);
+                setValues((prevValues) => ({ ...prevValues, ...parsedValues }));
+            }
+        }, [dataKey, setValues, storage]);
 
         const memoizedUpdateValues = React.useCallback(() => {
             try {

@@ -1,7 +1,7 @@
 import React from 'react';
 
 export interface useProgressProps<T extends {}> {
-    key: string;
+    dataKey: string;
     initialValues?: T;
     storage?: Storage;
     saveFunction?: (values: T) => void;
@@ -16,7 +16,7 @@ export interface useProgressProps<T extends {}> {
  *
  * @template T - The type of the form values.
  * @param {Object} props - The properties for the hook.
- * @param {string} props.key - The key to identify the stored values.
+ * @param {string} props.key - The dataKey to identify the stored values.
  * @param {T} [props.initialValues] - The initial values for the form.
  * @param {Storage} [props.storage] - The storage to use (localStorage or sessionStorage). Defaults to localStorage.
  * @param {(values: T) => void} [props.saveFunction] - Custom function to save values. If provided, this will be used instead of the storage.
@@ -26,7 +26,7 @@ export interface useProgressProps<T extends {}> {
  * @returns {[T, React.Dispatch<React.SetStateAction<T>>, () => void]} - Returns the current values, a function to update the values, and a function to clear the values.
  * */
 function useFormProgress<T extends {}>({
-                                           key,
+                                           dataKey,
                                            initialValues = {} as T,
                                            storage,
                                            saveFunction,
@@ -48,7 +48,7 @@ function useFormProgress<T extends {}>({
                     console.error('Failed to fetch initial values:', e);
                 }
             } else if (typeof window !== 'undefined') {
-                const saved = (storage ?? window.localStorage).getItem(key);
+                const saved = (storage ?? window.localStorage).getItem(dataKey);
                 try {
                     initialValue = JSON.parse(saved!);
                 } catch (e) {
@@ -75,7 +75,7 @@ function useFormProgress<T extends {}>({
             if (!forceLocalActions) return;
         }
         if (typeof window !== 'undefined') {
-            (storage ?? window.localStorage).setItem(key, JSON.stringify(values));
+            (storage ?? window.localStorage).setItem(dataKey, JSON.stringify(values));
         }
     };
 
@@ -86,7 +86,7 @@ function useFormProgress<T extends {}>({
             if (!forceLocalActions) return;
         }
         if (typeof window !== 'undefined') {
-            (storage ?? window.localStorage).removeItem(key);
+            (storage ?? window.localStorage).removeItem(dataKey);
         }
     };
 

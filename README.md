@@ -50,8 +50,8 @@ yarn add @crispice/save-progress
 
 ### The `useProgress` hook
 
-- The hook takes an object as an argument. The object must have a `key` property, which is a string.
-  The key is used to identify the data in the local or session storage. It is recommended that you use a unique key for
+- The hook takes an object as an argument. The object must have a `dataKey` property, which is a string.
+  The dataKey is used to identify the data in the local or session storage. It is recommended that you use a unique dataKey for
   each form.
 - The hook returns an array with three items. The first item is the `values` object, which contains the saved values.
   The second item is the `updateValues` function, which is used to update the values in the local storage.
@@ -86,7 +86,7 @@ initial values, or an empty object if no initial values were passed.
      > have stricter control over your data.
      > For example:
 > ```typescript
-> const [values, updateValues, deleteValues] = useFormProgress<{name: string, email: string}>({key: 'user-form'});
+> const [values, updateValues, deleteValues] = useFormProgress<{name: string, email: string}>({dataKey: 'user-form'});
 > ```
 
 #### Example
@@ -95,22 +95,22 @@ initial values, or an empty object if no initial values were passed.
 import {useFormProgress} from "@crispice/save-progress";
 
 const MyFormComponent = () => {
-    const [values, updateValues, deleteValues] = useFormProgress({key: 'user-form'});
+    const [values, updateValues, deleteValues] = useFormProgress({dataKey: 'user-form'});
 
     // or
     const [values, updateValues, deleteValues] = useFormProgress({
-        key: 'user-form',
+        dataKey: 'user-form',
         initialValues: {name: '', email: ''},
         // you can select where to save. Accepts localStorage or sessionStorage
         storage: sessionStorage,
         // this saveFunction overrides the default behavior
         saveFunction: (values) => {
             console.log('Saving values', values);
-            sessionStorage.setItem('my-key', JSON.stringify(values));
+            sessionStorage.setItem('my-dataKey', JSON.stringify(values));
         },
         clearFunction: (optionalArgument) => {
             console.log('Clearing values', optionalArgument);
-            sessionStorage.removeItem('my-key');
+            sessionStorage.removeItem('my-dataKey');
         },
         // passing this forceLocalSave property maintains the default behavior, but also carries out your custom save logic.
         forceLocalSave: false,
@@ -146,21 +146,18 @@ hook.
 It is primarily a passive component, and does not have any UI elements.
 
 It is up to you to create the form and handle the `submit` event. After submitting the form, it is advised that you
-reset
-the form values (using Formik's reset method, or any other way you see fit).
+reset the form values (using Formik's reset method, or any other way you see fit).
 - Once your form is reset, the values will be cleared from the local storage as well. Failure to do so will result in the values not being cleared from the local storage, and will be reloaded the next time the form is loaded.
 
-*Note that using this component outside a Formik context will result in a warning, or most likely, an error.*
+*Note that using this component outside a Formik context will result in a warning, or even worse, an error.*
 
 #### Example
 
 ```typescript
-import {AutoSaveFormikForm, useFormProgress} from "@crispice/save-progress";
+import {AutoSaveFormikForm} from "@crispice/save-progress";
 import {Formik, Form, Field} from 'formik';
 
 const MyFormComponent = () => {
-    const [values, updateValues, _] = useFormProgress({key: 'user-form', initialValues: {name: ''}});
-
     const handleChange = (e) => {
         // do something with the values
     }
@@ -189,10 +186,56 @@ const MyFormComponent = () => {
             }}
         >
             <Form>
-                <Field name="name" type="text"/>
-    <AutoSaveFormikForm saveFunction = {updateValues}
-    />
+                <AutoSaveFormikForm dataKey="user-form">
+                        <Field name="name" type="text"/>
+                </AutoSaveFormikForm>
             </Form>
+        </Formik>
+    )
+}
+```
+
+    - or my favorite way of using it -
+```typescript
+import {AutoSaveFormikForm} from "@crispice/save-progress";
+import {Formik, Form, Field} from 'formik';
+
+const MyFormComponent = () => {
+    const handleChange = (e) => {
+        // do something with the values
+    }
+    const handleSubmit = (values) => {
+        // do something with the values
+    }
+
+    return (
+        <Formik
+            initialValues={values}
+            validate={values => {
+                const errors = {};
+                if (values.name.length < 1) {
+                    errors.name = 'Enter a name.';
+                }
+                return errors;
+            }}
+            onSubmit={(values, actions, resetForm) => {
+                setTimeout(() => {
+                    alert(JSON.stringify(values, null, 2));
+                    actions.setSubmitting(false);
+                    // call Formik's reset method. This will clear the form values,
+                    // and will also clear the values from the local storage.
+                    resetForm({values: {name: ''}});
+                }, 1000);
+            }}
+        >
+            {({handleSubmit, isSubmitting, handleChange, handleBlur, values, errors, setFieldValue}) => (
+                <AutoSaveFormikForm dataKey="user-form">
+                    <form onSubmit={handleSubmit}>
+                        <Field name="name" type="text"/>
+                        <button type="submit">Submit</button>
+                    </form>
+                </AutoSaveFormikForm>
+            )}
         </Formik>
     )
 }
@@ -221,14 +264,13 @@ import {useFormProgress} from "@crispice/save-progress";
 import {AutoSaveForm} from "@crispice/save-progress";
 
 const MyFormComponent = () => {
-    const [values, updateValues, deleteValues] = useSaveProgress({key: 'user-form'});
+    const [values, updateValues, deleteValues] = useSaveProgress({dataKey: 'user-form'});
 
     return (
         // ... formik wrapper
-        <AutoSaveForm saveFunction = {updateValues}
-    />
-    // ... rest of the form
-)
+        <AutoSaveForm saveFunction = {updateValues} />
+        // ... rest of the form
+        );
 }
 ```
 
@@ -239,13 +281,13 @@ import {useFormProgress} from "@crispice/save-progress";
 import {AutoSaveFormikForm} from "@crispice/save-progress";
 
 const MyFormComponent = () => {
-    const [values, updateValues, deleteValues] = useFormProgress({key: 'user-form'});
+    // const [values, updateValues, deleteValues] = useFormProgress({dataKey: 'user-form'}); // No need to have this line anymore
 
     return (
-        <AutoSaveFormikForm saveFunction = {updateValues} >
-            {/* form elements */}
-            < /AutoSaveFormikForm>
-    )
+        <AutoSaveFormikForm dataKey="user-form"> // No need to pass the saveFunction prop. You could provide the `initialValues` prop but  I don't see why you would need to.
+            {/* form elements */} 
+        < /AutoSaveFormikForm>
+    );
 }
 ```
 
