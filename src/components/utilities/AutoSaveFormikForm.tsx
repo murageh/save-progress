@@ -4,7 +4,7 @@ import {useProgressProps} from "../../hooks/saveProgress/useProgress";
 import {useFormProgress} from "../../hooks";
 
 export interface AutoSaveFormProps<T extends {}> extends useProgressProps<T> {
-    children?: React.ReactNode;
+    children?: React.ReactNode | Element;
 }
 
 /**
