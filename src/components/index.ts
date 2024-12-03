@@ -1,2 +1,3 @@
 // Export each component individually, as a named export.
-export { default as AutoSaveForm } from "./utilities/AutoSaveForm";
+export {AutoSaveForm} from "./utilities/AutoSaveFormikForm";
+export {default as AutoSaveFormikForm} from "./utilities/AutoSaveFormikForm";
